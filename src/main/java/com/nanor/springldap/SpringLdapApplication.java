@@ -8,7 +8,9 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.password.LdapShaPasswordEncoder;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
@@ -21,10 +23,16 @@ public class SpringLdapApplication {
     }
 }
 
-@RestController
+@Controller
 class GreetingRestController {
 
+    @GetMapping("/login")
+    String login() {
+        return "login";
+    }
+
     @GetMapping(value = {"/greeting", "/"})
+    @ResponseBody
     String greet(Principal principal) {
         return "hello " + principal.getName();
     }
@@ -55,6 +63,11 @@ class LdapSecurityConfiguration extends WebSecurityConfigurerAdapter {
         httpSecurity.authorizeRequests()
                 .anyRequest().fullyAuthenticated()
                 .and()
-                .formLogin();
+                .formLogin()
+                .loginPage("/login")
+                .permitAll()
+                .and()
+                .logout()
+                .permitAll();
     }
 }
